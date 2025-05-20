@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="EduLearn Test Suite" parallel="methods" thread-count="2">
+    <listeners>
+        <listener class-name="com.edulearn.core.TestListener"/>
+    </listeners>
+    
+    <!-- UI Tests -->
+    <test name="Login Tests">
+        <classes>
+            <class name="com.edulearn.tests.LoginTest"/>
+        </classes>
+    </test>
+    
+    <test name="Course Tests">
+        <classes>
+            <class name="com.edulearn.tests.CourseTest"/>
+        </classes>
+    </test>
+    
+    <test name="Search Tests">
+        <classes>
+            <class name="com.edulearn.tests.SearchTest"/>
+        </classes>
+    </test>
+    
+    <!-- API Tests -->
+    <test name="API Tests" parallel="classes" thread-count="2">
+        <classes>
+            <class name="com.edulearn.api.CourseAPITest"/>
+        </classes>
+    </test>
+</suite>

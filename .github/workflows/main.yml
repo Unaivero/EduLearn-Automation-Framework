@@ -1,0 +1,56 @@
+name: EduLearn Automation Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight UTC
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chrome, firefox]
+        headless: [true]
+        
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+        
+    - name: Install Chrome and Firefox
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable firefox
+        
+    - name: Build with Maven
+      run: mvn -B clean compile
+      
+    - name: Run Tests
+      run: mvn -B test -Dbrowser=${{ matrix.browser }} -Dheadless=${{ matrix.headless }}
+      
+    - name: Publish Test Report
+      uses: mikepenz/action-junit-report@v3
+      if: always()
+      with:
+        report_paths: '**/target/surefire-reports/TEST-*.xml'
+        
+    - name: Archive Test Results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-reports-${{ matrix.browser }}
+        path: |
+          target/extent-reports/
+          target/screenshots/
+          target/logs/
