@@ -42,9 +42,19 @@ public class DriverFactory {
                 ChromeOptions chromeOptions = new ChromeOptions();
                 if (headless) {
                     chromeOptions.addArguments("--headless=new");
+                    // Add CI-specific options for stable execution
+                    chromeOptions.addArguments("--no-sandbox");
+                    chromeOptions.addArguments("--disable-dev-shm-usage");
+                    chromeOptions.addArguments("--disable-gpu");
+                    chromeOptions.addArguments("--remote-debugging-port=9222");
+                    chromeOptions.addArguments("--window-size=1920,1080");
+                    chromeOptions.addArguments("--disable-web-security");
+                    chromeOptions.addArguments("--allow-running-insecure-content");
                 }
                 chromeOptions.addArguments("--start-maximized");
                 chromeOptions.addArguments("--disable-notifications");
+                chromeOptions.addArguments("--disable-popup-blocking");
+                chromeOptions.addArguments("--disable-default-apps");
                 
                 // Set download directory preferences
                 Map<String, Object> prefs = new HashMap<>();

@@ -73,9 +73,29 @@ base.url=https://edulearn-demo.example.com
 
 # Test Configuration
 browser=chrome
-headless=false
-default.timeout=10
+headless=true  # Set to true for CI/CD environments
+default.timeout=30
+testdata.dir=src/test/resources/testdata
+
+# Test Credentials
+valid.username=testuser
+valid.password=Password123
+
+# API Configuration
+api.base.url=https://api.edulearn-demo.example.com
+api.timeout=30000
 ```
+
+### Configuration Priority
+
+The framework uses the following priority for configuration:
+1. **System Properties** (highest priority) - passed via `-D` flags
+2. **Config File Properties** - from config.properties file
+3. **Default Values** (lowest priority) - hardcoded defaults
+
+This allows easy overriding for different environments:
+- Local development: Use config.properties
+- CI/CD: Override with system properties
 
 ## Running Tests
 
@@ -86,14 +106,64 @@ To run all tests:
 mvn clean test
 ```
 
+To run tests with specific browser:
+```
+mvn clean test -Dbrowser=chrome
+```
+
+To run tests in headless mode:
+```
+mvn clean test -Dheadless=true
+```
+
 To run a specific test class:
 ```
 mvn clean test -Dtest=LoginTest
 ```
 
+To run with custom configuration:
+```
+mvn clean test -Dconfig.file=src/test/resources/config-ci.properties
+```
+
 ### Using TestNG
 
 Run the `testng.xml` file directly from your IDE.
+
+### CI/CD Configuration
+
+For CI/CD environments (like GitHub Actions), the framework automatically:
+- Runs in headless mode when `headless=true` system property is set
+- Uses system properties to override configuration file settings
+- Creates necessary directories for reports and screenshots
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Tests failing in CI/CD with display errors:**
+   - Ensure headless mode is enabled: `-Dheadless=true`
+   - Check that Chrome/Firefox are properly installed
+
+2. **WebDriver not found:**
+   - The framework uses WebDriverManager to auto-download drivers
+   - Ensure internet connection is available during first run
+
+3. **Tests timing out:**
+   - Increase timeout values in config.properties
+   - Check if the application URL is accessible
+
+4. **Screenshots not generated:**
+   - Verify that `target/screenshots` directory exists
+   - Check file permissions in CI/CD environment
+
+### GitHub Actions Troubleshooting
+
+If GitHub Actions workflows are failing:
+1. Check that headless mode is enabled in the workflow
+2. Verify all required directories are created
+3. Ensure system properties are properly passed to Maven
+4. Check the workflow logs for specific error messages
 
 ## Test Reports
 

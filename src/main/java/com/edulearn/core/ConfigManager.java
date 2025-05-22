@@ -54,11 +54,20 @@ public class ConfigManager {
     
     /**
      * Gets a property value as a String
+     * Priority: System Property > Config File Property
      * 
      * @param key property key
      * @return property value
      */
     public String getProperty(String key) {
+        // First check system properties (for CI/CD overrides)
+        String systemValue = System.getProperty(key);
+        if (systemValue != null && !systemValue.trim().isEmpty()) {
+            logger.debug("Using system property for {}: {}", key, systemValue);
+            return systemValue;
+        }
+        
+        // Fall back to config file property
         String value = properties.getProperty(key);
         if (value == null) {
             logger.warn("Property not found: {}", key);
@@ -108,7 +117,8 @@ public class ConfigManager {
      * @return browser name
      */
     public String getBrowser() {
-        return getProperty("browser");
+        String browser = getProperty("browser");
+        return browser != null ? browser : "chrome"; // Default to chrome
     }
     
     /**
@@ -117,6 +127,11 @@ public class ConfigManager {
      * @return true if headless mode is enabled
      */
     public boolean isHeadless() {
+        // Check for system property first (for CI/CD)
+        String systemHeadless = System.getProperty("headless");
+        if (systemHeadless != null) {
+            return Boolean.parseBoolean(systemHeadless);
+        }
         return getBooleanProperty("headless");
     }
     
