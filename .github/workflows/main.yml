@@ -18,22 +18,23 @@ jobs:
         browser: [chrome, firefox]
         
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up JDK 11
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
         
-    - name: Install Chrome and Firefox
+    - name: Install browsers and dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y google-chrome-stable firefox
+        sudo apt-get install -y google-chrome-stable firefox xvfb
         # Set display for headless mode
         export DISPLAY=:99
-        sudo Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        sudo Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+        sleep 3
         
     - name: Create necessary directories
       run: |
@@ -50,20 +51,22 @@ jobs:
         mvn -B test \
           -Dbrowser=${{ matrix.browser }} \
           -Dheadless=true \
-          -Dbase.url=https://edulearn-demo.example.com \
+          -Dbase.url=https://example.com \
           -Dmaven.test.failure.ignore=true \
           -Dsurefire.suiteXmlFiles=src/test/resources/testng.xml
       continue-on-error: true
+      env:
+        DISPLAY: :99
       
     - name: Publish Test Report
-      uses: mikepenz/action-junit-report@v3
+      uses: mikepenz/action-junit-report@v4
       if: always()
       with:
         report_paths: '**/target/surefire-reports/TEST-*.xml'
         fail_on_failure: false
         
     - name: Archive Test Results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-reports-${{ matrix.browser }}-${{ github.run_number }}

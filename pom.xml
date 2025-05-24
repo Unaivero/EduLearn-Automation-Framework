@@ -114,13 +114,15 @@
                         <browser>${browser}</browser>
                         <base.url>${base.url}</base.url>
                     </systemPropertyVariables>
-                    <argLine>-Xmx2048m -XX:MaxPermSize=256m</argLine>
+                    <argLine>-Xmx2048m -XX:+UseG1GC</argLine>
                     <testFailureIgnore>true</testFailureIgnore>
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
-                    <parallel>methods</parallel>
-                    <threadCount>2</threadCount>
+                    <parallel>classes</parallel>
+                    <threadCount>1</threadCount>
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
                 </configuration>
             </plugin>
             <plugin>
